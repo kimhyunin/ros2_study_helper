@@ -1,5 +1,7 @@
 # ROS2 Topic
+![topic_image](https://docs.ros.org/en/humble/_images/Topic-SinglePublisherandSingleSubscriber.gif)
 
+![topic_multi_image](https://docs.ros.org/en/humble/_images/Topic-MultiplePublisherandMultipleSubscriber.gif)
 ## Topic이란?
 
 Topic은 ROS2에서 **비동기 단방향 통신** 방식입니다. **발행자(Publisher)**가 메시지를 토픽에 발행하면, 해당 토픽을 구독하는 **구독자(Subscriber)** 모두가 메시지를 받습니다.
