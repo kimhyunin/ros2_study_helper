@@ -4,6 +4,7 @@ export default defineConfig({
   title: "ROS2 Humble 학습 도우미",
   description: "나만의 ROS2 Humble 학습 노트",
   lang: 'ko-KR',
+  base: '/ros2_study_helper/',
 
   appearance: 'dark',
 
