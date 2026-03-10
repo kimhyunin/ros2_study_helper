@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(node -e \"\nconst config = require\\('./docs/.vitepress/config.js'\\);\nconsole.log\\('Config loaded successfully'\\);\nconsole.log\\('Title:', config.default.title\\);\n\" 2>&1 || echo \"Note: ES module - checking syntax differently\")",
+      "Bash(npm run:*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)"
+    ]
+  }
+}

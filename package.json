@@ -1,0 +1,14 @@
+{
+  "name": "ros2-study-helper",
+  "version": "1.0.0",
+  "description": "ROS2 Humble Personal Study Helper",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.5.0"
+  }
+}
