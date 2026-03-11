@@ -1,4 +1,5 @@
 # ROS2 Action
+![action_image](https://docs.ros.org/en/humble/_images/Action-SingleActionClient.gif)
 
 ## Action이란?
 
