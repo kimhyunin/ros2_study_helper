@@ -27,6 +27,91 @@ Action은 **장시간 실행 작업**을 위한 통신 방식입니다. Goal을 
 | 취소 가능 | 불가 | 가능 |
 | 예시 | 파라미터 변경 | 내비게이션, 로봇 팔 이동 |
 
+---
+
+## 🐢 Turtlesim으로 배우는 Action
+
+turtlesim에는 `/turtle1/rotate_absolute` 액션이 내장되어 있습니다. 거북이를 특정 각도(절대값)로 회전시키는 장시간 작업입니다.
+
+### 준비
+
+```bash
+ros2 run turtlesim turtlesim_node
+ros2 run turtlesim turtle_teleop_key
+```
+
+teleop 터미널에서 **G, B, V, C, D, E, R, T** 키를 누르면 방향 회전 액션이 실행됩니다. **F** 키는 Goal 취소입니다.
+
+### 액션 목록 확인
+
+```bash
+ros2 action list -t
+```
+
+```
+/turtle1/rotate_absolute [turtlesim/action/RotateAbsolute]
+```
+
+### 액션 구조 확인
+
+```bash
+ros2 interface show turtlesim/action/RotateAbsolute
+```
+
+```
+# Goal — 목표 각도 (라디안)
+float32 theta
+---
+# Result — 실제 회전한 각도 차이
+float32 delta
+---
+# Feedback — 남은 회전량 (실시간)
+float32 remaining
+```
+
+### CLI에서 Goal 전송
+
+```bash
+# 1.57 라디안(약 90도)으로 회전
+ros2 action send_goal /turtle1/rotate_absolute \
+  turtlesim/action/RotateAbsolute "{theta: 1.57}"
+```
+
+```
+Waiting for an action server to become available...
+Sending goal:
+   theta: 1.5700000524520874
+
+Goal accepted with ID: ...
+Result:
+   delta: -1.5520004034042358
+Goal finished with status: SUCCEEDED
+```
+
+### Feedback 실시간 확인
+
+```bash
+ros2 action send_goal --feedback /turtle1/rotate_absolute \
+  turtlesim/action/RotateAbsolute "{theta: -1.57}"
+```
+
+```
+Feedback:
+   remaining: -1.5520004034042358
+Feedback:
+   remaining: -1.3020004034042358
+...
+Result:
+   delta: 1.5520004034042358
+```
+
+::: tip Goal 취소
+CLI에서 `Ctrl+C`를 누르거나, teleop 터미널에서 **F** 키를 누르면 진행 중인 Goal이 취소됩니다.
+새 Goal이 들어오면 이전 Goal은 자동으로 중단됩니다.
+:::
+
+---
+
 ## Action 인터페이스 파일 구조
 
 ```

@@ -17,6 +17,120 @@ Topic은 ROS2에서 **비동기 단방향 통신** 방식입니다. **발행자(
 - **N:1 통신**: 여러 발행자가 하나의 토픽에 발행 가능
 - 실시간 센서 데이터, 상태 정보 전송에 적합
 
+---
+
+## 🐢 Turtlesim으로 배우는 Topic
+
+### 준비
+
+```bash
+# 터미널 1
+ros2 run turtlesim turtlesim_node
+
+# 터미널 2
+ros2 run turtlesim turtle_teleop_key
+
+# 터미널 3 — 여기서 실습
+```
+
+### rqt_graph — 노드-토픽 관계 시각화
+
+```bash
+rqt_graph
+```
+
+`/teleop_turtle` 노드가 `/turtle1/cmd_vel` 토픽으로 메시지를 발행하고, `/turtlesim` 노드가 이를 구독하는 흐름을 볼 수 있습니다.
+
+### 토픽 목록 확인
+
+```bash
+ros2 topic list -t
+```
+
+```
+/parameter_events [rcl_interfaces/msg/ParameterEvent]
+/rosout [rcl_interfaces/msg/Log]
+/turtle1/cmd_vel [geometry_msgs/msg/Twist]      # 속도 명령
+/turtle1/color_sensor [turtlesim/msg/Color]     # 펜 색상
+/turtle1/pose [turtlesim/msg/Pose]              # 거북이 위치
+```
+
+### 메시지 실시간 확인
+
+```bash
+# teleop 터미널에서 방향키를 누르면서 확인
+ros2 topic echo /turtle1/cmd_vel
+```
+
+```yaml
+linear:
+  x: 2.0
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+```
+
+### 메시지 구조 확인
+
+```bash
+ros2 interface show geometry_msgs/msg/Twist
+```
+
+```
+# This expresses velocity in free space broken into its linear and angular parts.
+Vector3  linear
+    float64 x
+    float64 y
+    float64 z
+Vector3  angular
+    float64 x
+    float64 y
+    float64 z
+```
+
+### 토픽 정보 확인
+
+```bash
+ros2 topic info /turtle1/cmd_vel
+```
+
+```
+Type: geometry_msgs/msg/Twist
+Publisher count: 1
+Subscription count: 1
+```
+
+### CLI에서 직접 토픽 발행 — 거북이 움직이기
+
+```bash
+# 거북이를 원으로 움직이기 (1Hz로 계속 발행)
+ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist \
+  "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
+
+# 한 번만 발행
+ros2 topic pub --once /turtle1/cmd_vel geometry_msgs/msg/Twist \
+  "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
+```
+
+### 발행 주기 및 대역폭 확인
+
+```bash
+# /turtle1/pose 발행 주기 확인
+ros2 topic hz /turtle1/pose
+# average rate: 62.5 Hz
+
+# 대역폭 확인
+ros2 topic bw /turtle1/cmd_vel
+
+# 특정 메시지 타입의 토픽 찾기
+ros2 topic find geometry_msgs/msg/Twist
+```
+
+---
+
 ## Publisher 예시 (Python)
 
 ```python

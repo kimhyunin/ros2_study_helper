@@ -18,6 +18,99 @@ Parameter는 노드가 실행 중에 설정값을 외부에서 읽고 변경할 
 | `float_array` | `[1.0, 2.0]` |
 | `string_array` | `['a', 'b', 'c']` |
 
+---
+
+## 🐢 Turtlesim으로 배우는 Parameter
+
+### 준비
+
+```bash
+ros2 run turtlesim turtlesim_node
+ros2 run turtlesim turtle_teleop_key
+```
+
+### 파라미터 목록 확인
+
+```bash
+ros2 param list
+```
+
+```
+/turtlesim:
+  background_b    # 배경색 파란색 채널 (0~255)
+  background_g    # 배경색 초록색 채널 (0~255)
+  background_r    # 배경색 빨간색 채널 (0~255)
+  use_sim_time
+/teleop_turtle:
+  scale_angular
+  scale_linear
+  use_sim_time
+```
+
+### 파라미터 값 읽기
+
+```bash
+ros2 param get /turtlesim background_r
+# Integer value is: 69
+
+ros2 param get /turtlesim background_g
+# Integer value is: 86
+
+ros2 param get /turtlesim background_b
+# Integer value is: 255
+```
+
+### 실습: 배경색 바꾸기
+
+```bash
+# 배경색을 분홍색으로 변경
+ros2 param set /turtlesim background_r 255
+ros2 param set /turtlesim background_g 0
+ros2 param set /turtlesim background_b 100
+```
+
+turtlesim 창의 배경색이 실시간으로 바뀌는 것을 확인할 수 있습니다.
+
+### 파라미터 저장 & 불러오기
+
+```bash
+# 현재 파라미터를 YAML 파일로 저장
+ros2 param dump /turtlesim > turtlesim_params.yaml
+
+# 저장된 파일 내용
+cat turtlesim_params.yaml
+```
+
+```yaml
+/turtlesim:
+  ros__parameters:
+    background_b: 100
+    background_g: 0
+    background_r: 255
+    use_sim_time: false
+```
+
+```bash
+# 저장된 파라미터 불러오기 (실행 중인 노드에 적용)
+ros2 param load /turtlesim turtlesim_params.yaml
+
+# 시작할 때부터 파라미터 파일 적용 (read-only 포함)
+ros2 run turtlesim turtlesim_node --ros-args --params-file turtlesim_params.yaml
+```
+
+### teleop 속도 조절
+
+```bash
+# 선속도 스케일 변경 (기본값: 2.0)
+ros2 param get /teleop_turtle scale_linear
+ros2 param set /teleop_turtle scale_linear 5.0
+
+# 각속도 스케일 변경 (기본값: 2.0)
+ros2 param set /teleop_turtle scale_angular 5.0
+```
+
+---
+
 ## Parameter 선언 및 사용
 
 ```python

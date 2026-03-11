@@ -12,6 +12,81 @@ Node는 ROS2에서 **최소 실행 단위**입니다. 하나의 노드는 단일
 [camera_node] --토픽--> [image_processor_node] --토픽--> [object_detector_node]
 ```
 
+---
+
+## 🐢 Turtlesim으로 배우는 Node
+
+turtlesim은 ROS2 개념을 익히기 위한 가장 기본적인 시뮬레이터입니다.
+
+### 실행해보기
+
+터미널을 **3개** 열고 각각 실행합니다.
+
+```bash
+# 터미널 1 — 시뮬레이터 실행
+ros2 run turtlesim turtlesim_node
+
+# 터미널 2 — 키보드 조종 노드 실행
+ros2 run turtlesim turtle_teleop_key
+
+# 터미널 3 — 실행 중인 노드 확인
+ros2 node list
+```
+
+**출력 결과:**
+```
+/turtlesim
+/teleop_turtle
+```
+
+두 개의 노드가 실행 중입니다. `turtlesim_node`가 `/turtlesim` 노드를, `turtle_teleop_key`가 `/teleop_turtle` 노드를 만들었습니다.
+
+### 노드 상세 정보 확인
+
+```bash
+ros2 node info /turtlesim
+```
+
+```
+/turtlesim
+  Subscribers:
+    /turtle1/cmd_vel: geometry_msgs/msg/Twist        # 속도 명령 수신
+  Publishers:
+    /turtle1/color_sensor: turtlesim/msg/Color       # 펜 색상 발행
+    /turtle1/pose: turtlesim/msg/Pose                # 위치 발행
+  Service Servers:
+    /clear: std_srvs/srv/Empty
+    /kill: turtlesim/srv/Kill
+    /reset: turtlesim/srv/Empty
+    /spawn: turtlesim/srv/Spawn
+    /turtle1/set_pen: turtlesim/srv/SetPen
+    /turtle1/teleport_absolute: turtlesim/srv/TeleportAbsolute
+    /turtle1/teleport_relative: turtlesim/srv/TeleportRelative
+  Action Servers:
+    /turtle1/rotate_absolute: turtlesim/action/RotateAbsolute
+```
+
+### 노드 이름 변경 (Remapping)
+
+```bash
+# 노드 이름을 my_turtle로 바꿔서 실행
+ros2 run turtlesim turtlesim_node --ros-args --remap __node:=my_turtle
+
+# 확인
+ros2 node list
+# /my_turtle
+# /teleop_turtle
+```
+
+::: info rqt_graph로 시각화
+```bash
+rqt_graph
+```
+노드 간의 연결 관계를 그래프로 볼 수 있습니다. `/teleop_turtle` → `/turtle1/cmd_vel` → `/turtlesim` 흐름을 확인하세요.
+:::
+
+---
+
 ## Node 생명주기 (Lifecycle)
 
 Managed Node(lifecycle node)를 사용하면 노드의 상태를 체계적으로 관리할 수 있습니다.
@@ -30,6 +105,29 @@ Unconfigured --[configure]--> Inactive --[activate]--> Active
 | `Inactive` | 설정 완료. 통신 미활성 |
 | `Active` | 정상 동작 중 |
 | `Finalized` | 종료 완료 |
+
+---
+
+## CLI 명령어 정리
+
+```bash
+# 노드 실행
+ros2 run <패키지> <실행파일>
+
+# 노드 이름 변경 후 실행
+ros2 run <패키지> <실행파일> --ros-args --remap __node:=<새이름>
+
+# 네임스페이스 추가
+ros2 run <패키지> <실행파일> --ros-args -r __ns:=/robot1
+
+# 실행 중인 노드 목록
+ros2 node list
+
+# 노드 상세 정보 (구독, 발행, 서비스, 액션 목록)
+ros2 node info /노드이름
+```
+
+---
 
 ## 기본 Node 구조 (rclpy)
 
@@ -96,12 +194,10 @@ class MyLifecycleNode(LifecycleNode):
 
     def on_configure(self, state):
         self.get_logger().info('노드 설정 중...')
-        # 리소스 초기화
         return TransitionCallbackReturn.SUCCESS
 
     def on_activate(self, state):
         self.get_logger().info('노드 활성화!')
-        # 타이머, 퍼블리셔 활성화
         return TransitionCallbackReturn.SUCCESS
 
     def on_deactivate(self, state):
@@ -123,54 +219,11 @@ def main(args=None):
     rclpy.shutdown()
 ```
 
-## Node 실행 방법
-
-### 직접 실행
-
-```bash
-# python 파일 직접 실행
-python3 my_node.py
-
-# ros2 run으로 실행 (패키지에 등록된 경우)
-ros2 run my_package my_node
-```
-
-### 노드 이름 변경
-
-```bash
-# 실행 시 노드 이름 변경
-ros2 run my_package my_node --ros-args -r __node:=custom_name
-
-# 네임스페이스 추가
-ros2 run my_package my_node --ros-args -r __ns:=/robot1
-```
-
-### 실행 중인 노드 확인
-
-```bash
-# 노드 목록
-ros2 node list
-
-# 노드 상세 정보
-ros2 node info /my_node
-
-# 예시 출력:
-# /my_node
-#   Subscribers:
-#     /parameter_events: rcl_interfaces/msg/ParameterEvent
-#   Publishers:
-#     /rosout: rcl_interfaces/msg/Log
-#   Service Servers:
-#     /my_node/describe_parameters: ...
-#   Service Clients:
-#   Action Servers:
-#   Action Clients:
-```
+---
 
 ## 로깅
 
 ```python
-# 로그 레벨별 사용
 self.get_logger().debug('디버그 메시지')
 self.get_logger().info('정보 메시지')
 self.get_logger().warn('경고 메시지')
@@ -181,33 +234,7 @@ self.get_logger().fatal('치명적 에러')
 self.get_logger().info('1초마다 출력', throttle_duration_sec=1.0)
 ```
 
-## 멀티 Node (Executor)
-
-```python
-import rclpy
-from rclpy.executors import MultiThreadedExecutor
-
-def main(args=None):
-    rclpy.init(args=args)
-
-    node1 = MyNode1()
-    node2 = MyNode2()
-
-    # 멀티스레드 실행자 사용
-    executor = MultiThreadedExecutor()
-    executor.add_node(node1)
-    executor.add_node(node2)
-
-    try:
-        executor.spin()
-    finally:
-        executor.shutdown()
-        node1.destroy_node()
-        node2.destroy_node()
-        rclpy.shutdown()
-```
-
-## 유용한 팁
+---
 
 ::: tip 노드 이름 규칙
 - 소문자와 밑줄 사용: `my_node`, `camera_driver`
